@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
@@ -26,13 +26,15 @@ class OrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<OrderController>();
-    final textStyle = GoogleFonts.roboto(
 
-    );
     return SafeArea(child:
-    Scaffold(
+        GestureDetector(
+        onTap: () {
+      FocusScope.of(context).unfocus(); // Hides the keyboard
+    },
+    child: Scaffold(
       backgroundColor:  Colors.white,
-      appBar: AppBar(title: Text('Orders - $tableName',style: textStyle.copyWith(fontSize: 20, fontWeight: FontWeight.w600,color:Colors.purple),),
+      appBar: AppBar(title: Text('Orders - $tableName',style: TextStyle(fontFamily: 'Roboto',fontSize: 20, fontWeight: FontWeight.w600,color:Colors.purple),),
           backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
@@ -171,9 +173,7 @@ class OrderScreen extends StatelessWidget {
                             textColor = Colors.black;
                         }
 
-                        final textStyle = GoogleFonts.roboto(
-                          color: textColor,
-                        );
+
 
                         return Card(
                           color: Colors.white,
@@ -191,16 +191,16 @@ class OrderScreen extends StatelessWidget {
                                         children: [
                                           Text(
                                             '${item.name} x${item.quantity} @ ₹${item.price.toStringAsFixed(2)}',
-                                            style: textStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+                                            style: TextStyle(fontFamily: 'Roboto',fontSize: 16, fontWeight: FontWeight.w600,color:textColor),
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
                                             'Total: ₹${(item.quantity * item.price).toStringAsFixed(2)}',
-                                            style: textStyle,
+                                            style: TextStyle(fontFamily: 'Roboto',color:textColor),
                                           ),
                                           Text(
                                             'Status: ${item.status}',
-                                            style: textStyle,
+                                            style: TextStyle(fontFamily: 'Roboto',color:textColor),
                                           ),
                                         ],
                                       ),
@@ -217,7 +217,7 @@ class OrderScreen extends StatelessWidget {
                                         value: status,
                                         child: Text(
                                           status,
-                                          style: GoogleFonts.roboto(),
+                                          style: TextStyle(fontFamily: 'Roboto'),
                                         ),
                                       ))
                                           .toList(),
@@ -249,50 +249,7 @@ class OrderScreen extends StatelessWidget {
                 ),
 
 
-             /*   Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        try {
-                          controller.requestBill(tableName);
 
-                          final items = controller.getOrder(tableName);
-                          final total = controller.getTotalBill(tableName);
-
-                          print('Generating PDF...');
-                          final pdfBytes = await generateBillPdf(tableName, items, total);
-
-                          Get.to(() => PdfPreviewScreen(pdfBytes: pdfBytes));
-                          print('PDF shared successfully.');
-                        } catch (e) {
-                          print('Error while generating/sharing PDF: $e');
-                          Get.snackbar("Error", e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
-                        }
-                      },
-
-                      icon: const Icon(Icons.receipt_long,color: Colors.white,size: 25,),
-                      label: const Text('Generate Bill'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue, // Background color for Generate Bill
-                        foregroundColor: Colors.white, // Text and icon color
-                      ),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        controller.completeOrder(tableName);
-                        Get.back();
-                      },
-                      icon: const Icon(Icons.check_circle,color: Colors.white,size: 25,),
-                      label: const Text('Complete'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green, // Background color for Generate Bill
-                        foregroundColor: Colors.white, // Text and icon color
-                      ),
-                    ),
-                  ],
-                ),*/
 
                 Obx(() {
                   final allServed = controller.allItemsServed(tableName);
@@ -349,56 +306,33 @@ class OrderScreen extends StatelessWidget {
       ),
 
       bottomNavigationBar: Container(
-        //  height: 150,
-        // width: 300,
         color: Colors.purple.shade500,
-        //alignment: Alignment.bottomCenter,
-          child:
-      Obx(() {
-        final total = controller.getTotalBill(controller.tables.firstWhereOrNull((table) => controller.orders[table]?.isNotEmpty ?? false) ?? '');
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            'Total Bill: ₹${total.toStringAsFixed(2)}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
-            textAlign: TextAlign.center,
-          ),
-        );
-      })),
-
-
-    ));
-  }
-
-
-
-  /*Future<Uint8List> generateBillPdf(String tableName, List<OrderItem> items, double total) async {
-    final pdf = pw.Document();
-    final font = await PdfGoogleFonts.robotoRegular();
-
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) => pw.Column(
-          children: [
-            pw.Text('Bill for $tableName', style: pw.TextStyle(font: font, fontSize: 24)),
-            pw.SizedBox(height: 20),
-            pw.ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return pw.Text('${item.name} x${item.quantity} - ₹${(item.quantity * item.price).toStringAsFixed(2)}', style: pw.TextStyle(font: font));
-              },
+        child: Obx(() {
+          final current = controller.currentTable.value;
+          final total = controller.getTotalBill(current);
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Total Bill: ₹${total.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
             ),
-            pw.SizedBox(height: 20),
-            pw.Text('Total: ₹${total.toStringAsFixed(2)}', style: pw.TextStyle(font: font, fontSize: 18)),
-          ],
-        ),
+          );
+        }),
       ),
-    );
 
-    return await pdf.save();
+
+
+    )));
   }
-*/
+
+
+
+
   Future<Uint8List> generateBillPdf(String tableName, List<OrderItem> items, double total) async {
     final pdf = pw.Document();
     final font = await PdfGoogleFonts.robotoRegular();
@@ -501,7 +435,7 @@ class OrderScreen extends StatelessWidget {
               ),
 
               pw.SizedBox(height: 20),
-              pw.Text('Notes', style: pw.TextStyle(font: font, fontSize: 14)),
+              pw.Text('Thank you !', style: pw.TextStyle(font: font, fontSize: 14)),
               pw.Text('Your satisfaction is our success!', style: pw.TextStyle(font: font)),
             ],
           );
@@ -564,41 +498,3 @@ class OrderScreen extends StatelessWidget {
 
 }
 
-/*   ElevatedButton(
-                      onPressed: () {
-                        final summary = controller.getOrder(tableName)
-                            .map((item) => '${item.name} x${item.quantity} - ${item.status}')
-                            .join('\n');
-                        Get.dialog(
-                          AlertDialog(
-                            title: const Text('Order'),
-                            content: Text(summary),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  final summary = controller.getOrder(tableName)
-                                      .map((item) =>
-                                  '${item.name} x${item.quantity} @ ₹${item.price.toStringAsFixed(2)} - ${item.status}')
-                                      .join('\n');
-                                  final total = controller.getTotalBill(tableName);
-                                  Get.dialog(
-                                    AlertDialog(
-                                      title: const Text('Order Summary'),
-                                      content: Text('$summary\n\nTotal: ₹${total.toStringAsFixed(2)}'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Get.back(),
-                                          child: const Text('Close'),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                },
-                                child: const Text('Close'),
-                              )
-                            ],
-                          ),
-                        );
-                      },
-                      child: const Text('View'),
-                    ),*/

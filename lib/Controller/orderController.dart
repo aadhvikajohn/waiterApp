@@ -92,6 +92,7 @@ class OrderController extends GetxController {
   RxMap<String, bool> billRequested = <String, bool>{}.obs;
   RxMap<String, DateTime> occupiedSince = <String, DateTime>{}.obs;
   RxMap<String, RxString> tableTimers = <String, RxString>{}.obs;
+  var currentTable = ''.obs;
 
   final Box<List> orderBox = Hive.box<List>('orders');
   final Box<String> occupiedTimeBox = Hive.box<String>('occupied_times');
@@ -213,9 +214,15 @@ class OrderController extends GetxController {
     occupiedSince.remove(table);
     occupiedTimeBox.delete(table);
     tableTimers.remove(table);
+
+    if (currentTable.value == table) {
+      currentTable.value = '';
+    }
+
     orders[table]?.refresh();
     update();
   }
+
 
   void requestBill(String table) {
     billRequested[table] = true;

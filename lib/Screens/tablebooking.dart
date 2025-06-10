@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 
 
 import '../Controller/orderController.dart';
@@ -12,8 +13,8 @@ class TableListScreennew extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<OrderController>();
-    final TextStyle textStyle = GoogleFonts.roboto();
 
+    DateTime? _lastPressed;
     return Scaffold(
      // backgroundColor:  Color(0xffffffff),
       appBar: AppBar(
@@ -27,7 +28,7 @@ class TableListScreennew extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               'Dine-In Tables',
-              style: textStyle.copyWith(
+              style: TextStyle(fontFamily: 'Roboto',
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.purple,
@@ -35,15 +36,29 @@ class TableListScreennew extends StatelessWidget {
             ),
           ],
         ),
-        leading: IconButton(
-          icon:  Icon(Icons.exit_to_app,color:Colors.purple),
-          onPressed: () {
-            Get.offAll(() =>  TableListScreennew());
-            controller.update(); // Also refresh when manually pressing back
-            Get.back();
-          },
-        ),
-        centerTitle: false,
+
+
+          leading: IconButton(
+          icon: Icon(Icons.exit_to_app, color: Colors.black),
+      onPressed: () {
+        final now = DateTime.now();
+        if (_lastPressed == null ||
+            now.difference(_lastPressed!) > Duration(seconds: 2)) {
+          _lastPressed = now;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Press again to exit"),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        } else {
+          // Exit the app
+          SystemNavigator.pop(); // For Android; for iOS, you might want to avoid this
+        }
+      },
+    ),
+
+    centerTitle: false,
         elevation: 0,
       ),
 
@@ -95,6 +110,7 @@ class TableListScreennew extends StatelessWidget {
                         if (!controller.orders.containsKey(table)) {
                           controller.orders[table] = <OrderItem>[].obs;
                         }
+                        controller.currentTable.value = controller.tables[index];
                         Get.offAll(() => OrderScreen(tableName: table))!
                             .then((_) => controller.update());
                       },
@@ -121,7 +137,7 @@ class TableListScreennew extends StatelessWidget {
                             const SizedBox(height: 12),
                             Text(
                               table,
-                              style: textStyle.copyWith(
+                              style: TextStyle(fontFamily: 'Roboto',
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,

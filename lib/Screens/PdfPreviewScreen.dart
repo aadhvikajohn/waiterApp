@@ -3,12 +3,12 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+
 import 'package:tablebooking/Screens/OrderScreen.dart';
 
 class PdfPreviewScreen extends StatefulWidget {
@@ -35,14 +35,12 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = GoogleFonts.roboto(
 
-    );
     return Scaffold(
         backgroundColor:  Colors.white,
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: Text('Invoice for -${widget.tableName}',style: textStyle.copyWith(fontSize: 20, fontWeight: FontWeight.w600,color:Colors.purple),),
+          title: Text('Invoice for -${widget.tableName}',style: TextStyle(fontFamily: 'Roboto',fontSize: 20, fontWeight: FontWeight.w600,color:Colors.purple),),
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
